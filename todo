@@ -1,0 +1,40 @@
+require "pry"
+require "./db/setup"
+require "./lib/all"
+
+puts "Running TaskMaster 2000"
+
+def add list_name, task
+	list =List.find_by("name = '#{list_name}'")
+  unless list 
+    List.create(name: list_name)
+    List.find_by("name = '#{list_name}'").tasks.create(description: "#{task}")
+  else
+    List.find_by("name = '#{list_name}'").tasks.create(description: "#{task}")
+  end
+end
+
+
+command = ARGV.shift
+case command
+when "add"
+  
+  #adds a new task to a list. Creates list if need be
+  list = ARGV.shift
+  task =ARGV.shift
+  puts "Adding #{task} to #{list}"
+  add list, task
+when "due"
+  #marks and item as being due at a certain date
+
+when "done"
+
+when "list"
+
+when "next"
+
+when "search"
+
+else
+  puts 
+end
