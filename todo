@@ -1,6 +1,7 @@
 require "pry"
 require "./db/setup"
 require "./lib/all"
+require 'date'
 
 puts "Running TaskMaster 2000"
 
@@ -14,6 +15,13 @@ def add list_name, task
   end
 end
 
+def due task, due_date
+  binding.pry
+  date = DateTime.parse("#{due_date}")
+  task =Task.find_by("description = '#{task}'")
+  task.due_date = date
+  task.save!
+end
 
 command = ARGV.shift
 case command
@@ -25,8 +33,11 @@ when "add"
   puts "Adding #{task} to #{list}"
   add list, task
 when "due"
-  #marks and item as being due at a certain date
+  #marks an item as being due at a certain date
+  task =ARGV.shift
+  due_date =ARGV.shift
 
+  due task, due_date
 when "done"
 
 when "list"
