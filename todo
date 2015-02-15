@@ -2,50 +2,113 @@ require "pry"
 require "./db/setup"
 require "./lib/all"
 require 'date'
-
-puts "Running TaskMaster 2000"
+require 'colorize'
 
 def add list_name, task
-	list =List.find_by("name = '#{list_name}'")
-  unless list 
-    List.create(name: list_name)
-    List.find_by("name = '#{list_name}'").tasks.create(description: "#{task}")
+  puts "Adding #{task} to #{list_name}"
+  List.where(name: list_name).first_or_create!
+    .tasks.create(description: task)
+end
+
+def due n, due_date
+  date = DateTime.parse(due_date)
+  puts "#{n} due date being set to: #{date}"
+  Task.find(n).update(due_date: date)
+end
+
+def mark_complete n
+  puts "Marking #{Task.find(n).description} as complete."
+  Task.find(n).update(done: true)
+end
+
+def list all: false, name: nil
+  if !(all || name)
+    tasks = Task.where(done: false)
+  elsif all
+    tasks = Task.order(:done)
   else
-    List.find_by("name = '#{list_name}'").tasks.create(description: "#{task}")
+    tasks = List.find_by(name: name).tasks
+  end
+  puts "Task List".rjust(35)
+  print "Id  ". ljust(25) + "Task  ".ljust(25) + "Due Date  ".ljust(25) + "Completed?".ljust(25)
+  tasks.each do |t|
+    display_item t
   end
 end
 
-def due task, due_date
-  binding.pry
-  date = DateTime.parse("#{due_date}")
-  task =Task.find_by("description = '#{task}'")
-  task.due_date = date
-  task.save!
+def display_item item
+  color = if item.done == true
+      :green
+    else
+      :red
+    end
+  done = item.done.to_s.colorize(color)
+  puts
+  print "#{item.id}  ".ljust(25) + "#{item.description}  ".ljust(25) +
+    "#{item.due_date}  ".ljust(25) + "#{done}".ljust(25)
+  puts
 end
+
+def random
+  items = Task.where("due_date is not null")
+  if items == []
+    items = Task.all
+  end
+  item_ids = []
+  items.each do |i|
+    item_ids.push i.id
+  end
+  id = item_ids.sample
+  print "Id  ". ljust(25) + "Task  ".ljust(25) + "Due Date  ".ljust(25) + "Completed?".ljust(25)
+  display_item Task.find(id)
+end
+
+def search str
+  tasks = Task.where("description like '%#{str}%'")
+  print "Id  ". ljust(25) + "Task  ".ljust(25) + "Due Date  ".ljust(25) + "Completed?".ljust(25)
+  tasks.each do |task|
+    display_item task
+  end
+end
+
+###############################
+
+puts "Running TaskMaster 2000"
 
 command = ARGV.shift
 case command
 when "add"
-  
-  #adds a new task to a list. Creates list if need be
-  list = ARGV.shift
-  task =ARGV.shift
-  puts "Adding #{task} to #{list}"
-  add list, task
+  task_list = ARGV.shift
+  task = ARGV.shift
+  add task_list, task
 when "due"
-  #marks an item as being due at a certain date
-  task =ARGV.shift
-  due_date =ARGV.shift
-
-  due task, due_date
+  n = ARGV.shift
+  due_date = ARGV.shift
+  due n, due_date
 when "done"
-
+  task = ARGV.shift
+  mark_complete task
 when "list"
-
+  name = ARGV.shift
+  if name == "all"
+    list all: true
+  elsif name
+    list name: name
+  else
+    list
+  end
 when "next"
-
+  random
 when "search"
-
+  str = ARGV.shift
+  search str
 else
-  puts 
+  puts "Invalid Command"
 end
+
+
+
+
+
+
+
