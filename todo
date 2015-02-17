@@ -11,7 +11,6 @@ def add list_name, task
 end
 
 def due n, due_date
-  date = DateTime.parse(due_date)
   puts "#{n} due date being set to: #{date}"
   Task.find(n).update(due_date: date)
 end
@@ -51,9 +50,7 @@ end
 
 def random
   items = Task.where("due_date is not null")
-  if items == []
-    items = Task.all
-  end
+  items = Task.all if items == []
   item_ids = []
   items.each do |i|
     item_ids.push i.id
