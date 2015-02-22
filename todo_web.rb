@@ -10,7 +10,6 @@ class TodoWeb < Sinatra::Base
     User.find_by_login username
   end
 
-
   post "/lists/:list/tasks" do 
     current_user.add_task params['list'], params['task_name']
     'OK'
