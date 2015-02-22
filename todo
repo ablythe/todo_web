@@ -4,21 +4,6 @@ require "./lib/all"
 require 'date'
 require 'colorize'
 
-def add list_name, task
-  puts "Adding #{task} to #{list_name}"
-  List.where(name: list_name).first_or_create!
-    .tasks.create(description: task)
-end
-
-def due n, due_date
-  puts "#{n} due date being set to: #{date}"
-  Task.find(n).update(due_date: date)
-end
-
-def mark_complete n
-  puts "Marking #{Task.find(n).description} as complete."
-  Task.find(n).update(done: true)
-end
 
 def list all: false, name: nil
   if !(all || name)
@@ -31,74 +16,49 @@ def list all: false, name: nil
   puts "Task List".rjust(35)
   print "Id  ". ljust(25) + "Task  ".ljust(25) + "Due Date  ".ljust(25) + "Completed?".ljust(25)
   tasks.each do |t|
-    display_item t
+    t.display_item 
   end
 end
 
-def display_item item
-  color = if item.done == true
-      :green
-    else
-      :red
-    end
-  done = item.done.to_s.colorize(color)
-  puts
-  print "#{item.id}  ".ljust(25) + "#{item.description}  ".ljust(25) +
-    "#{item.due_date}  ".ljust(25) + "#{done}".ljust(25)
-  puts
-end
-
-def random
-  items = Task.where("due_date is not null")
-  items = Task.all if items == []
-  item_ids = []
-  items.each do |i|
-    item_ids.push i.id
-  end
-  id = item_ids.sample
-  print "Id  ". ljust(25) + "Task  ".ljust(25) + "Due Date  ".ljust(25) + "Completed?".ljust(25)
-  display_item Task.find(id)
-end
-
-def search str
-  tasks = Task.where("description like '%#{str}%'")
+def search user, str
+  tasks = user.tasks.where("description like '%#{str}%'")
   print "Id  ". ljust(25) + "Task  ".ljust(25) + "Due Date  ".ljust(25) + "Completed?".ljust(25)
   tasks.each do |task|
-    display_item task
+    task.display_item 
   end
 end
 
 ###############################
 
 puts "Running TaskMaster 2000"
-
+user = User.find_by_login ARGV.shift
 command = ARGV.shift
 case command
 when "add"
   task_list = ARGV.shift
   task = ARGV.shift
-  add task_list, task
+  current_user.add_task task_list, task
 when "due"
   n = ARGV.shift
   due_date = ARGV.shift
-  due n, due_date
+  task =Task.find(n)
+  task.add_due_date due_date
 when "done"
   task = ARGV.shift
-  mark_complete task
+  task.mark_complete!
 when "list"
   name = ARGV.shift
-  if name == "all"
-    list all: true
-  elsif name
-    list name: name
+  if name = ""
+    current_user.list_tasks 'nil'
   else
-    list
+    current_user.list_tasks name
   end
 when "next"
-  random
+  task =current_user.tasks.random
+  task.display_item
 when "search"
   str = ARGV.shift
-  search str
+  search current_user, str
 else
   puts "Invalid Command"
 end
