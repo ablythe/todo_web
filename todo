@@ -22,7 +22,7 @@ case command
 when "add"
   task_list = ARGV.shift
   task = ARGV.shift
-  current_user.add_task task_list, task
+  user.add_task task_list, task
 when "due"
   n = ARGV.shift
   due_date = ARGV.shift
@@ -33,17 +33,17 @@ when "done"
   task.mark_complete!
 when "list"
   name = ARGV.shift
-  if name = ""
-    current_user.list_tasks 'nil'
+  if name == ""
+    user.list_tasks 'nil'
   else
-    current_user.list_tasks name
+    user.list_tasks name
   end
 when "next"
-  task =current_user.tasks.random
+  task =user.tasks.random
   task.display_item
 when "search"
   str = ARGV.shift
-  search current_user, str
+  search user, str
 else
   puts "Invalid Command"
 end
