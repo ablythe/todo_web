@@ -6,7 +6,8 @@ require './lib/all'
 class TodoWeb < Sinatra::Base
 
   def current_user
-    username = request.env["HTTP_AUTHORIZATION"]
+    username = "ablythe"
+    # request.env["HTTP_AUTHORIZATION"]
     User.find_by_login username
   end
 
@@ -26,8 +27,9 @@ class TodoWeb < Sinatra::Base
   end
 
   get "/lists/:list/tasks" do
-    tasks = current_user.list_tasks params['list']
-    tasks.to_json
+    @tasks = current_user.list_tasks params['list']
+    erb :task_list
+    
   end
 
   get "/lists/all/tasks/next" do 

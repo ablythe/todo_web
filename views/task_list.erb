@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+	</head>
+	<body>
+		<div class='container'>
+			<h2 class = "text-center text-capitalize"><%= params['list'] %></h2>
+			<table class = "table table_bordered">
+				<thead>
+					<tr>
+						<th>Task</th>
+						<th>Due Date</th>
+						<th>Completed?</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% @tasks.each do |task|%>
+						<tr>
+							<td><%= task.description %></td>
+							<td><%= task.due_date %></td>
+							<% if task.done == false %>
+								<td class = "danger">Incomplete</td>
+							<% else %>
+								<td class = "success">Complete </td>
+							<%end%>
+						</tr>
+						<% end%>
+				</tbody>
+		</div>	
+	</body>
+</html>
