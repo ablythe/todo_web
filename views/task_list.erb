@@ -22,9 +22,13 @@
 							<td><%= task.description %></td>
 							<td><%= task.due_date %></td>
 							<% if task.done == false %>
-							<td class = "danger">Incomplete</td>
+							<td class = "danger">
+								<form action = "/complete?id=<%=task.id%>" method = "POST">
+									<button class ="btn btn-primary btn-block">Mark Complete</button>
+								</form>
+							</td>
 							<% else %>
-							<td class = "success">Complete </td>
+							<td class = "success text-center">Complete!</td>
 							<%end%>
 						</tr>
 						<% end%>
