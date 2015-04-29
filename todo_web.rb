@@ -28,7 +28,6 @@ class TodoWeb < Sinatra::Base
 
   post "/login" do
     session[:username] = params[:username]
-    binding.pry
     redirect to(session[:page_saver])
   end
 
