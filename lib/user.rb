@@ -11,12 +11,12 @@ class User < ActiveRecord::Base
     if arg == 'nil'
       tasks = self.tasks.where(done: false)
     elsif arg == 'all'
-      tasks = self.tasks.order(:done)
+      tasks = self.tasks
     else
       list = self.lists.find_by(name: arg)
       tasks = Task.where(list_id: list.id)
     end
-    tasks
+    tasks.order(:done)
   end
 
   def add_task list, description
